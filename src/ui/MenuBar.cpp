@@ -365,6 +365,13 @@ MenuBar::MenuBar(QWidget *parent)
 
   repository->addSeparator();
 
+  mApplyPatch = repository->addAction(tr("Apply Patch..."));
+  connect(mApplyPatch, &QAction::triggered, [this] {
+    view()->promptToApplyPatch();
+  });
+
+  repository->addSeparator();
+
   QMenu *lfs = repository->addMenu(tr("Git LFS"));
   mLfsUnlock = lfs->addAction(tr("Remove all locks"));
   connect(mLfsUnlock, &QAction::triggered, [this] {
@@ -853,6 +860,7 @@ void MenuBar::updateRepository()
   mStageAll->setEnabled(view && view->isStageEnabled());
   mUnstageAll->setEnabled(view && view->isUnstageEnabled());
   mAmendCommit->setEnabled(view);
+  mApplyPatch->setEnabled(view);
 
   bool lfs = view && view->repo().lfsIsInitialized();
   mLfsUnlock->setEnabled(lfs);

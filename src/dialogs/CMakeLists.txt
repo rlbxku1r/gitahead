@@ -16,6 +16,7 @@ add_library(dialogs
   IconLabel.cpp
   MergeDialog.cpp
   NewBranchDialog.cpp
+  PatchDialog.cpp
   PluginsPanel.cpp
   PullRequestDialog.cpp
   RemoteDialog.cpp

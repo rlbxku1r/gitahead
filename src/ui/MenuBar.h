@@ -73,6 +73,7 @@ private:
   QAction *mUnstageAll;
   QAction *mCommit;
   QAction *mAmendCommit;
+  QAction *mApplyPatch;
   QAction *mLfsUnlock;
   QAction *mLfsInitialize;
 

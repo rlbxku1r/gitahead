@@ -28,6 +28,7 @@
 #include "dialogs/DeleteBranchDialog.h"
 #include "dialogs/DeleteTagDialog.h"
 #include "dialogs/NewBranchDialog.h"
+#include "dialogs/PatchDialog.h"
 #include "dialogs/RemoteDialog.h"
 #include "dialogs/SettingsDialog.h"
 #include "dialogs/TagDialog.h"
@@ -47,6 +48,8 @@
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QtNetwork>
 #include <QPushButton>
@@ -1618,6 +1621,13 @@ void RepoView::cherryPick(const git::Commit &commit)
   this->commit(msg, git::AnnotatedCommit(), parent);
 }
 
+void RepoView::promptToApplyPatch()
+{
+  QString path = PatchDialog::getApplyFileName(this);
+  if (!path.isEmpty())
+    applyPatch(path);
+}
+
 void RepoView::promptToForcePush(
   const git::Remote &remote,
   const git::Reference &src)
@@ -2636,6 +2646,32 @@ bool RepoView::checkForConflicts(LogEntry *parent, const QString &action)
 
   refresh();
   return true;
+}
+
+void RepoView::applyPatch(const QString &path)
+{
+  LogEntry *entry = addLogEntry(path, tr("Apply Patch"));
+  auto error = [this, entry, &path](const QString &message) {
+    this->error(entry, tr("apply patch"), QFileInfo(path).fileName(), message);
+  };
+
+  QFile file(path);
+  if (!file.open(QFile::ReadOnly)) {
+    error(file.errorString());
+    return;
+  }
+
+  QByteArray buffer = file.readAll();
+  git::Diff diff = git::Diff::fromBuffer(buffer);
+  if (!diff.isValid()) {
+    error(tr("The patch file is invalid"));
+    return;
+  }
+
+  if (!mRepo.applyDiff(diff)) {
+    error(git::Repository::lastError());
+    return;
+  }
 }
 
 #include "RepoView.moc"
