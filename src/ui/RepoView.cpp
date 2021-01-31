@@ -1623,7 +1623,7 @@ void RepoView::cherryPick(const git::Commit &commit)
 
 void RepoView::promptToApplyPatch()
 {
-  QString path = PatchDialog::getApplyFileName(this);
+  QString path = ApplyPatchDialog::getOpenFileName(this);
   if (!path.isEmpty())
     applyPatch(path);
 }

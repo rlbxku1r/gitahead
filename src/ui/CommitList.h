@@ -87,8 +87,6 @@ private:
   bool isDecoration(const QModelIndex &index, const QPoint &pos);
   bool isStar(const QModelIndex &index, const QPoint &pos);
 
-  void savePatch(const QString &path) const;
-
   QString mFile;
   QModelIndex mStar;
   QModelIndex mCancel;

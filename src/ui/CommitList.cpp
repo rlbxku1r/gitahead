@@ -1493,13 +1493,12 @@ void CommitList::contextMenuEvent(QContextMenuEvent *event)
           index.data(CommitRole).value<git::Commit>().setStarred(!anyStarred);
     });
 
-    QAction *savePatchAs = menu.addAction(tr("Save Patch As..."), [this] {
-      QString path = PatchDialog::getSaveFileName(this);
-      if (!path.isEmpty())
-        savePatch(path);
+    QAction *savePatch = menu.addAction(tr("Save Patch..."), [this] {
+       SavePatchDialog *dialog = new SavePatchDialog(this, selectedCommits());
+       dialog->open();
     });
 
-    savePatchAs->setEnabled(allValid);
+    savePatch->setEnabled(allValid);
 
     // single selection
     if (selectionModel()->selectedIndexes().size() <= 1) {
@@ -1825,22 +1824,6 @@ bool CommitList::isStar(const QModelIndex &index, const QPoint &pos)
   QStyleOptionViewItem options = viewOptions();
   options.rect = visualRect(index);
   return delegate->starRect(options, index).contains(pos);
-}
-
-void CommitList::savePatch(const QString &path) const
-{
-  RepoView *view = RepoView::parentView(this);
-  LogEntry *entry = view->addLogEntry(path, tr("Save Patch As"));
-
-  QSaveFile file(path);
-  if (file.open(QSaveFile::WriteOnly)) {
-    QByteArray buffer = selectedDiff().toBuffer();
-    if (file.write(buffer) != -1)
-      file.commit();
-  }
-
-  if (file.error() != QSaveFile::NoError)
-    view->error(entry, tr("save patch"), QFileInfo(path).fileName(), file.errorString());
 }
 
 #include "CommitList.moc"
