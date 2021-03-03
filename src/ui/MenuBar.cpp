@@ -41,6 +41,7 @@
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QDir>
 #include <QFileDialog>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -333,6 +334,12 @@ MenuBar::MenuBar(QWidget *parent)
   mConfigureRepository->setMenuRole(QAction::NoRole);
   connect(mConfigureRepository, &QAction::triggered, [this] {
     view()->configureSettings();
+  });
+
+  mOpenWorkingDirectory = repository->addAction(tr("Open Working Directory"));
+  connect(mOpenWorkingDirectory, &QAction::triggered, [this] {
+    QDir dir = view()->repo().workdir();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir.absolutePath()));
   });
 
   repository->addSeparator();
@@ -856,6 +863,7 @@ void MenuBar::updateRepository()
   MainWindow *win = qobject_cast<MainWindow *>(window());
   RepoView *view = win ? win->currentView() : nullptr;
   mConfigureRepository->setEnabled(view);
+  mOpenWorkingDirectory->setEnabled(view && !view->repo().isBare());
   mCommit->setEnabled(view && view->isCommitEnabled());
   mStageAll->setEnabled(view && view->isStageEnabled());
   mUnstageAll->setEnabled(view && view->isUnstageEnabled());

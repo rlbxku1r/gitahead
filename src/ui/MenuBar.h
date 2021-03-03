@@ -69,6 +69,7 @@ private:
 
   // Repository
   QAction *mConfigureRepository;
+  QAction *mOpenWorkingDirectory;
   QAction *mStageAll;
   QAction *mUnstageAll;
   QAction *mCommit;
